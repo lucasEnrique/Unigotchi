@@ -1,0 +1,379 @@
+var status;
+var gotchi;
+var hBar;
+var pBar;
+var transObj;
+var GameState = {
+	preload: function preload() {
+		//Preload de imagens
+		this.load.image('minigameMask', 'ASSETS/GENERAL/minigame_mask.png');
+		this.load.image('maskScreen', 'ASSETS/GENERAL/mask_screen.png');
+		this.load.image('middleBtn', 'ASSETS/GENERAL/btn_02.png');
+		this.load.image('sideBtn', 'ASSETS/GENERAL/btn_01.png');
+		this.load.image('healthBar', 'ASSETS/HUD/life_bar.png');
+		this.load.image('potentialBar', 'ASSETS/HUD/potential_bar.png');
+		this.load.image('barFill', 'ASSETS/HUD/bar_fill.png');
+
+		//preload de botões
+		this.load.spritesheet('studyBtn','ASSETS/HUD/studySS.png', 97, 194);
+		this.load.spritesheet('waterBtn','ASSETS/HUD/waterSS.png', 97, 194);
+		this.load.spritesheet('eatBtn','ASSETS/HUD/eatSS.png', 97, 194);
+		this.load.spritesheet('relaxBtn','ASSETS/HUD/relaxSS.png', 97, 194);
+		this.load.spritesheet('playBtn','ASSETS/HUD/playSS.png', 97, 194);
+		this.load.spritesheet('noCellBtn','ASSETS/HUD/noCellSS.png', 97, 194);
+
+		//Preload de animações
+		game.load.atlas('char1', 'ASSETS/CHARACTER/PNGS SEQ/CHARACTER 01/character1SSjson.png', 'ASSETS/CHARACTER/PNGS SEQ/CHARACTER 01/character1SSjson.json');
+		game.load.atlas('transicao', 'ASSETS/CHARACTER/PNGS SEQ/transicaoSS.png', 'ASSETS/CHARACTER/PNGS SEQ/transicaoSS.json');
+	},
+	create: function() {
+		
+		game.stage.backgroundColor = '#94c936';
+
+		this.maskScreen = this.game.add.sprite(189,335, 'maskScreen');
+		this.maskScreen.scale.setTo(0.35, 0.35);
+		this.maskScreen.anchor.setTo(0.5, 0.5);
+
+		this.studyBtn = this.add.button(17,455, 'studyBtn', estudar, this, 0, 0, 1, 0);
+		this.studyBtn.anchor.setTo(0, 0.5);
+		this.studyBtn.scale.setTo(0.38, 0.38);
+
+		this.waterBtn = this.add.button(17,370, 'waterBtn', banho, this, 0, 0, 1, 0);
+		this.waterBtn.anchor.setTo(0, 0.5);
+		this.waterBtn.scale.setTo(0.38, 0.38);
+
+		this.eatBtn = this.add.button(17,285, 'eatBtn', comer, this, 0, 0, 1, 0);
+		this.eatBtn.anchor.setTo(0, 0.5);
+		this.eatBtn.scale.setTo(0.38, 0.38);
+
+		this.relaxBtn = this.add.button(325,455, 'relaxBtn', relax, this, 0, 0, 1, 0);
+		this.relaxBtn.anchor.setTo(0, 0.5);
+		this.relaxBtn.scale.setTo(0.38, 0.38);
+
+		this.playBtn = this.add.button(325,370, 'playBtn', jogar, this, 0, 0, 1, 0);
+		this.playBtn.anchor.setTo(0, 0.5);
+		this.playBtn.scale.setTo(0.38, 0.38);
+
+		this.noCellBtn = this.add.button(325,285, 'noCellBtn', noCell, this, 0, 0, 1, 0);
+		this.noCellBtn.anchor.setTo(0, 0.5);
+		this.noCellBtn.scale.setTo(0.38, 0.38);
+
+		this.healthFill = this.game.add.sprite(20, 197, 'barFill');
+		this.healthFill.scale.setTo(0.35, 0.34);
+		hBar = 0.35;
+
+		this.potentialFill = this.game.add.sprite(355, 197, 'barFill');
+		this.potentialFill.anchor.setTo(1, 0);
+		this.potentialFill.scale.setTo(0.35, 0.34);
+		
+
+		hBar = this.game.add.sprite(20, 190, 'healthBar');
+		hBar.scale.setTo(0.35, 0.35);
+
+		pBar = this.game.add.sprite(355, 190, 'potentialBar');
+		pBar.anchor.setTo(1, 0);
+		pBar.scale.setTo(0.35, 0.35);
+
+		gotchi = game.add.sprite(189, 365, 'char1');
+		gotchi.anchor.setTo(0.5, 0.5);
+		gotchi.scale.setTo(0.38, 0.38);
+
+		transObj = game.add.sprite(189, 365, 'transicao');
+		transObj.anchor.setTo(0.5,0.5);
+		transObj.scale.setTo(1,1);
+
+		this.minigameMask = this.game.add.sprite(0, 0, 'minigameMask');
+		this.minigameMask.scale.setTo(0.35, 0.35);
+
+		this.middleBtn = this.game.add.sprite(189,600, 'middleBtn');
+		this.middleBtn.anchor.setTo(0.5, 0.5);
+		this.middleBtn.scale.setTo(0.35, 0.35);
+
+		this.leftBtn = this.game.add.sprite(109,585, 'sideBtn');
+		this.leftBtn.anchor.setTo(0.5, 0.5);
+		this.leftBtn.scale.setTo(0.35, 0.35);
+
+		this.rightBtn = this.game.add.sprite(269,585, 'sideBtn');
+		this.rightBtn.anchor.setTo(0.5, 0.5);
+		this.rightBtn.scale.setTo(0.35, 0.35);
+
+		game.stage.disableVisibilityChange = true;
+
+		gotchi.animations.add('idleAnim', [ "neutro__00000.png", "neutro__00001.png", "neutro__00002.png", "neutro__00003.png", "neutro__00004.png", 
+											"neutro__00005.png", "neutro__00006.png", "neutro__00007.png", "neutro__00008.png", "neutro__00009.png", 
+											"neutro__00010.png", "neutro__00011.png", "neutro__00012.png", "neutro__00013.png", "neutro__00014.png", 
+											"neutro__00015.png", "neutro__00016.png", "neutro__00017.png", "neutro__00018.png", "neutro__00019.png" ], 15, true);
+		gotchi.animations.add('relaxAnim',[ "relax__00000.png", "relax__00001.png", "relax__00002.png", "relax__00003.png", "relax__00004.png", 
+											"relax__00005.png", "relax__00006.png", "relax__00007.png", "relax__00008.png", "relax__00009.png", 
+											"relax__00010.png", "relax__00011.png", "relax__00012.png", "relax__00013.png", "relax__00014.png", 
+											"relax__00015.png", "relax__00016.png", "relax__00017.png", "relax__00018.png", "relax__00019.png" ], 15, true);
+		gotchi.animations.add('cellAnim', [ "cel__00000.png", "cel__00001.png", "cel__00002.png", "cel__00003.png", "cel__00004.png", 
+											"cel__00005.png", "cel__00006.png", "cel__00007.png", "cel__00008.png", "cel__00009.png", 
+											"cel__00010.png", "cel__00011.png", "cel__00012.png", "cel__00013.png", "cel__00014.png", 
+											"cel__00015.png", "cel__00016.png", "cel__00017.png", "cel__00018.png", "cel__00019.png" ], 15, true);
+		gotchi.animations.add('banhoAnim',[ "banho__00000.png", "banho__00001.png", "banho__00002.png", "banho__00003.png", "banho__00004.png", 
+											"banho__00005.png", "banho__00006.png", "banho__00007.png", "banho__00008.png", "banho__00009.png", 
+											"banho__00010.png", "banho__00011.png", "banho__00012.png", "banho__00013.png", "banho__00014.png", 
+											"banho__00015.png", "banho__00016.png", "banho__00017.png", "banho__00018.png", "banho__00019.png" ], 15, true);
+		gotchi.animations.add('eatAnim',  [ "eat__00000.png", "eat__00001.png", "eat__00002.png", "eat__00003.png", "eat__00004.png", 
+											"eat__00005.png", "eat__00006.png", "eat__00007.png", "eat__00008.png", "eat__00009.png", 
+											"eat__00010.png", "eat__00011.png", "eat__00012.png", "eat__00013.png", "eat__00014.png", 
+											"eat__00015.png", "eat__00016.png", "eat__00017.png", "eat__00018.png", "eat__00019.png" ], 15, true);
+		gotchi.animations.add('playAnim', [ "play__00000.png", "play__00001.png", "play__00002.png", "play__00003.png", "play__00004.png", 
+											"play__00005.png", "play__00006.png", "play__00007.png", "play__00008.png", "play__00009.png", 
+											"play__00010.png", "play__00011.png", "play__00012.png", "play__00013.png", "play__00014.png", 
+											"play__00015.png", "play__00016.png", "play__00017.png", "play__00018.png", "play__00019.png" ], 15, true);
+		gotchi.animations.add('sleepAnim',[ "sleep__00000.png", "sleep__00001.png", "sleep__00002.png", "sleep__00003.png", "sleep__00004.png", 
+											"sleep__00005.png", "sleep__00006.png", "sleep__00007.png", "sleep__00008.png", "sleep__00009.png", 
+											"sleep__00010.png", "sleep__00011.png", "sleep__00012.png", "sleep__00013.png", "sleep__00014.png", 
+											"sleep__00015.png", "sleep__00016.png", "sleep__00017.png", "sleep__00018.png", "sleep__00019.png" ], 15, true);
+		gotchi.animations.add('studyAnim',[ "study__00000.png", "study__00001.png", "study__00002.png", "study__00003.png", "study__00004.png", 
+											"study__00005.png", "study__00006.png", "study__00007.png", "study__00008.png", "study__00009.png", 
+											"study__00010.png", "study__00011.png", "study__00012.png", "study__00013.png", "study__00014.png", 
+											"study__00015.png", "study__00016.png", "hello__00017.png", "hello__00018.png", "hello__00019.png" ], 15, true);
+		gotchi.animations.add('helloAnim',[ "hello__00000.png", "hello__00001.png", "hello__00002.png", "hello__00003.png", "hello__00004.png", 
+											"hello__00005.png", "hello__00006.png", "hello__00007.png", "hello__00008.png", "hello__00009.png", 
+											"hello__00010.png", "hello__00011.png", "hello__00012.png", "hello__00013.png", "hello__00014.png", 
+											"hello__00015.png", "hello__00016.png", "hello__00017.png", "hello__00018.png", "hello__00019.png" ], 15, true);
+
+		transObj.animations.add('transAnim',["transicao_00001.png", "transicao_00002.png", "transicao_00003.png", "transicao_00004.png", "transicao_00005.png", "transicao_00006.png",
+											"transicao_00007.png", "transicao_00008.png", "transicao_00009.png", "transicao_00010.png", "transicao_00011.png",
+											"transicao_00012.png", "transicao_00013.png", "transicao_00014.png", "transicao_00015.png", "transicao_00016.png",
+											"transicao_00017.png", "transicao_00018.png", "transicao_00019.png", "transicao_00020.png", "transicao_00021.png",
+											"transicao_00022.png", "transicao_00023.png", "transicao_00024.png", "transicao_00025.png", "transicao_00026.png",
+											"transicao_00027.png", "transicao_00028.png", "transicao_00029.png", "transicao_00030.png", "transicao_00031.png",
+											"transicao_00032.png", "transicao_00033.png", "transicao_00034.png", "transicao_00035.png", "transicao_00036.png", 
+											"transicao_00037.png", "transicao_00038.png", ], 15, true);
+			
+
+		gotchi.animations.play('idleAnim');
+		
+		gotchi.inputEnable = true;
+		gotchi.events.onInputDown.add(clickMe);
+
+		status = 0;
+	},
+	update: function() {
+		if(this.healthFill.scale.x > 0)
+		{
+			this.healthFill.scale.x -= 0.000002;	
+		}
+		if(this.potentialFill.scale.x > 0)
+		{
+			this.potentialFill.scale.x -= 0.0000001;	
+		}
+	}
+}
+
+function estudar() {
+	var date = new Date();
+	if((date.getDay() >= 1) || (date.getDay() <= 5))
+	{
+		if((date.getHours() >= 10 || date.getHours() <= 18) && status == 0)
+		{
+			status = 1;
+			transObj.animations.play('transAnim'); 
+
+			setTimeout(function() {
+				gotchi.y = 390;
+				gotchi.animations.play('studyAnim');
+				pBar.scale.x = 0.35;
+			}, 2100);
+			setTimeout(function() {
+				transObj.animations.stop('transAnim', true);
+			}, 2500);
+			setTimeout(function() {
+				transObj.animations.play('transAnim');
+			}, 4500);
+			setTimeout(function() {
+				gotchi.y = 365;
+				gotchi.animations.play('idleAnim');
+			}, 5300);
+			setTimeout(function() {
+				transObj.animations.stop('transAnim', true);
+			}, 7000);
+
+			setTimeout(function() {
+				status = 0;
+			},7001);
+		}
+	}
+
+
+	
+}
+function banho() {
+	var date = new Date();
+	if((date.getDay() >= 1) || (date.getDay() <= 5))
+	{
+		if((date.getHours() >= 10 || date.getHours() <= 18) && status == 0)
+		{
+			status = 1;
+			transObj.animations.play('transAnim');
+			
+			setTimeout(function() {
+				gotchi.animations.play('banhoAnim');
+				hBar.scale.x = 0.35;
+			}, 2100);
+			setTimeout(function() {
+				transObj.animations.stop('transAnim', true);
+			}, 2500);
+			setTimeout(function() {
+				transObj.animations.play('transAnim');
+			}, 4500);
+			setTimeout(function() {
+				gotchi.animations.play('idleAnim');
+			}, 5300);
+			setTimeout(function() {
+				transObj.animations.stop('transAnim', true);
+			}, 7000);
+
+			setTimeout(function() {
+				status = 0;
+			},7001);			
+		}
+	}
+}
+function comer() {
+	var date = new Date();
+
+	if((date.getHours() >= 7 || date.getHours() <= 22) && status == 0)
+	{
+		status = 1;
+		transObj.animations.play('transAnim');
+
+		setTimeout(function() {
+			gotchi.animations.play('eatAnim');
+			hBar.scale.x = 0.35;
+		}, 2100);
+		setTimeout(function() {
+			transObj.animations.stop('transAnim', true);
+		}, 2500);
+		setTimeout(function() {
+			transObj.animations.play('transAnim');
+		}, 4500);
+		setTimeout(function() {
+			gotchi.animations.play('idleAnim');
+		}, 5300);
+		setTimeout(function() {
+			transObj.animations.stop('transAnim', true);
+		}, 7100);
+
+		setTimeout(function() {
+			status = 0;
+		},7001);	
+	}
+}	
+function relax() {
+	var date = new Date();
+	console.log(date.getDay());
+	if((date.getDay() == 0 || date.getDay() == 6) && status == 0)
+	{
+		if(date >= 7 || date <= 22)
+		{
+			status = 1;
+			transObj.animations.play('transAnim');
+
+			setTimeout(function() {
+				gotchi.animations.play('relaxAnim');
+				pBar.scale.x = 0.35;
+			}, 2100);
+			setTimeout(function() {
+				transObj.animations.stop('transAnim', true);
+			}, 2500);
+			setTimeout(function() {
+				transObj.animations.play('transAnim');
+			}, 4500);
+			setTimeout(function() {
+				gotchi.animations.play('idleAnim');
+			}, 5300);
+			setTimeout(function() {
+				transObj.animations.stop('transAnim', true);
+			}, 7000);
+
+			setTimeout(function() {
+				status = 0;
+			},7001);			
+		}
+	}
+}
+function jogar() {
+	var date = new Date();
+	if((date.getDay() >= 1 || date.getDay() <= 5) && status == 0)
+	{
+		if(date.getHours() >= 7 || date.getHours() <= 22)
+		{
+			status = 1;
+			transObj.animations.play('transAnim');
+
+			setTimeout(function() {
+				gotchi.animations.play('playAnim');
+				pBar.scale.x = 0.35;
+			}, 2100);
+			setTimeout(function() {
+				transObj.animations.stop('transAnim', true);
+			}, 2500);
+			setTimeout(function() {
+				transObj.animations.play('transAnim');
+			}, 4500);
+			setTimeout(function() {
+				gotchi.animations.play('idleAnim');
+			}, 5300);
+			setTimeout(function() {
+				transObj.animations.stop('transAnim', true);
+			}, 7000);
+
+			setTimeout(function() {
+				status = 0;
+			},7001);	
+		}
+	}
+}	
+
+function noCell() {
+	var date = new Date();
+
+	if((date.getHours() >= 7 || date.getHours() <= 22) && status == 0)
+	{
+		status = 1;
+		transObj.animations.play('transAnim');
+
+		setTimeout(function() {
+			gotchi.animations.play('cellAnim');
+			pBar.scale.x = 0.35;
+		}, 2100);
+		setTimeout(function() {
+			gotchi.animations.stop('cellAnim', false);
+		}, 3400);
+		setTimeout(function() {
+			transObj.animations.stop('transAnim', true);
+		}, 2600);
+		setTimeout(function() {
+			transObj.animations.play('transAnim');
+		}, 4000);
+		setTimeout(function() {
+			gotchi.animations.play('idleAnim');
+		}, 4800);
+		setTimeout(function() {
+			transObj.animations.stop('transAnim', true);
+		}, 6600);
+
+		setTimeout(function() {
+			status = 0;
+		},7001);	
+	}
+}
+
+function clickMe() {
+	status = 1;
+	gotchi.animations.play('helloAnim');
+	setTimeout(function() {
+		gotchi.animations.play('idleAnim');
+		status = 0;
+	}, 2500)
+}
+
+var game = new Phaser.Game(378, 670, Phaser.CANVAS);
+
+game.state.add('GameState', GameState);
+game.state.start('GameState');
