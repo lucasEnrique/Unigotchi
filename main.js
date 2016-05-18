@@ -28,8 +28,11 @@ var GameState = {
 	},
 	create: function() {
 		
+		Phaser.Canvas.setTouchAction(game.canvas, "auto"); // disable the default "none", i.e."touch-action: none" CSS style
+		game.input.touch.preventDefault = false;
 		game.stage.backgroundColor = '#94c936';
 
+		//Criando sprites
 		this.maskScreen = this.game.add.sprite(189,335, 'maskScreen');
 		this.maskScreen.scale.setTo(0.35, 0.35);
 		this.maskScreen.anchor.setTo(0.5, 0.5);
@@ -58,21 +61,20 @@ var GameState = {
 		this.noCellBtn.anchor.setTo(0, 0.5);
 		this.noCellBtn.scale.setTo(0.38, 0.38);
 
-		this.healthFill = this.game.add.sprite(20, 197, 'barFill');
-		this.healthFill.scale.setTo(0.35, 0.34);
-		hBar = 0.35;
+		hBar = this.game.add.sprite(22, 197, 'barFill');
+		hBar.scale.setTo(0.35, 0.34);
 
-		this.potentialFill = this.game.add.sprite(355, 197, 'barFill');
-		this.potentialFill.anchor.setTo(1, 0);
-		this.potentialFill.scale.setTo(0.35, 0.34);
+		pBar = this.game.add.sprite(353, 197, 'barFill');
+		pBar.anchor.setTo(1, 0);
+		pBar.scale.setTo(0.35, 0.34);
 		
 
-		hBar = this.game.add.sprite(20, 190, 'healthBar');
-		hBar.scale.setTo(0.35, 0.35);
+		this.healthBar = game.add.sprite(20, 190, 'healthBar');
+		this.healthBar.scale.setTo(0.35, 0.35);
 
-		pBar = this.game.add.sprite(355, 190, 'potentialBar');
-		pBar.anchor.setTo(1, 0);
-		pBar.scale.setTo(0.35, 0.35);
+		this.potentialBar = this.game.add.sprite(355, 190, 'potentialBar');
+		this.potentialBar.anchor.setTo(1, 0);
+		this.potentialBar.scale.setTo(0.35, 0.35);
 
 		gotchi = game.add.sprite(189, 365, 'char1');
 		gotchi.anchor.setTo(0.5, 0.5);
@@ -97,40 +99,50 @@ var GameState = {
 		this.rightBtn.anchor.setTo(0.5, 0.5);
 		this.rightBtn.scale.setTo(0.35, 0.35);
 
-		game.stage.disableVisibilityChange = true;
 
+		game.stage.disableVisibilityChange = true; //Permite o jogo rodar sem ter o foco na tela
+
+		//Adicionar animações
 		gotchi.animations.add('idleAnim', [ "neutro__00000.png", "neutro__00001.png", "neutro__00002.png", "neutro__00003.png", "neutro__00004.png", 
 											"neutro__00005.png", "neutro__00006.png", "neutro__00007.png", "neutro__00008.png", "neutro__00009.png", 
 											"neutro__00010.png", "neutro__00011.png", "neutro__00012.png", "neutro__00013.png", "neutro__00014.png", 
 											"neutro__00015.png", "neutro__00016.png", "neutro__00017.png", "neutro__00018.png", "neutro__00019.png" ], 15, true);
+		
 		gotchi.animations.add('relaxAnim',[ "relax__00000.png", "relax__00001.png", "relax__00002.png", "relax__00003.png", "relax__00004.png", 
 											"relax__00005.png", "relax__00006.png", "relax__00007.png", "relax__00008.png", "relax__00009.png", 
 											"relax__00010.png", "relax__00011.png", "relax__00012.png", "relax__00013.png", "relax__00014.png", 
 											"relax__00015.png", "relax__00016.png", "relax__00017.png", "relax__00018.png", "relax__00019.png" ], 15, true);
+		
 		gotchi.animations.add('cellAnim', [ "cel__00000.png", "cel__00001.png", "cel__00002.png", "cel__00003.png", "cel__00004.png", 
 											"cel__00005.png", "cel__00006.png", "cel__00007.png", "cel__00008.png", "cel__00009.png", 
 											"cel__00010.png", "cel__00011.png", "cel__00012.png", "cel__00013.png", "cel__00014.png", 
 											"cel__00015.png", "cel__00016.png", "cel__00017.png", "cel__00018.png", "cel__00019.png" ], 15, true);
+		
 		gotchi.animations.add('banhoAnim',[ "banho__00000.png", "banho__00001.png", "banho__00002.png", "banho__00003.png", "banho__00004.png", 
 											"banho__00005.png", "banho__00006.png", "banho__00007.png", "banho__00008.png", "banho__00009.png", 
 											"banho__00010.png", "banho__00011.png", "banho__00012.png", "banho__00013.png", "banho__00014.png", 
 											"banho__00015.png", "banho__00016.png", "banho__00017.png", "banho__00018.png", "banho__00019.png" ], 15, true);
+		
 		gotchi.animations.add('eatAnim',  [ "eat__00000.png", "eat__00001.png", "eat__00002.png", "eat__00003.png", "eat__00004.png", 
 											"eat__00005.png", "eat__00006.png", "eat__00007.png", "eat__00008.png", "eat__00009.png", 
 											"eat__00010.png", "eat__00011.png", "eat__00012.png", "eat__00013.png", "eat__00014.png", 
 											"eat__00015.png", "eat__00016.png", "eat__00017.png", "eat__00018.png", "eat__00019.png" ], 15, true);
+		
 		gotchi.animations.add('playAnim', [ "play__00000.png", "play__00001.png", "play__00002.png", "play__00003.png", "play__00004.png", 
 											"play__00005.png", "play__00006.png", "play__00007.png", "play__00008.png", "play__00009.png", 
 											"play__00010.png", "play__00011.png", "play__00012.png", "play__00013.png", "play__00014.png", 
 											"play__00015.png", "play__00016.png", "play__00017.png", "play__00018.png", "play__00019.png" ], 15, true);
+		
 		gotchi.animations.add('sleepAnim',[ "sleep__00000.png", "sleep__00001.png", "sleep__00002.png", "sleep__00003.png", "sleep__00004.png", 
 											"sleep__00005.png", "sleep__00006.png", "sleep__00007.png", "sleep__00008.png", "sleep__00009.png", 
 											"sleep__00010.png", "sleep__00011.png", "sleep__00012.png", "sleep__00013.png", "sleep__00014.png", 
 											"sleep__00015.png", "sleep__00016.png", "sleep__00017.png", "sleep__00018.png", "sleep__00019.png" ], 15, true);
+		
 		gotchi.animations.add('studyAnim',[ "study__00000.png", "study__00001.png", "study__00002.png", "study__00003.png", "study__00004.png", 
 											"study__00005.png", "study__00006.png", "study__00007.png", "study__00008.png", "study__00009.png", 
 											"study__00010.png", "study__00011.png", "study__00012.png", "study__00013.png", "study__00014.png", 
-											"study__00015.png", "study__00016.png", "hello__00017.png", "hello__00018.png", "hello__00019.png" ], 15, true);
+											"study__00015.png", "study__00016.png", "study__00017.png", "study__00018.png", "study__00019.png" ], 15, true);
+
 		gotchi.animations.add('helloAnim',[ "hello__00000.png", "hello__00001.png", "hello__00002.png", "hello__00003.png", "hello__00004.png", 
 											"hello__00005.png", "hello__00006.png", "hello__00007.png", "hello__00008.png", "hello__00009.png", 
 											"hello__00010.png", "hello__00011.png", "hello__00012.png", "hello__00013.png", "hello__00014.png", 
@@ -144,7 +156,6 @@ var GameState = {
 											"transicao_00027.png", "transicao_00028.png", "transicao_00029.png", "transicao_00030.png", "transicao_00031.png",
 											"transicao_00032.png", "transicao_00033.png", "transicao_00034.png", "transicao_00035.png", "transicao_00036.png", 
 											"transicao_00037.png", "transicao_00038.png", ], 15, true);
-			
 
 		gotchi.animations.play('idleAnim');
 		
@@ -154,22 +165,31 @@ var GameState = {
 		status = 0;
 	},
 	update: function() {
-		if(this.healthFill.scale.x > 0)
+		//Condicionais para o decaimento das barras de Health e Potencial.
+
+		if(hBar.scale.x > 0)
 		{
-			this.healthFill.scale.x -= 0.000002;	
+			hBar.scale.x -= 0.00002;	
 		}
-		if(this.potentialFill.scale.x > 0)
+		if(pBar.scale.x > 0)
 		{
-			this.potentialFill.scale.x -= 0.0000001;	
+			pBar.scale.x -= 0.000001;	
 		}
 	}
 }
+/*
 
+Todas as funções de ações(estudar, banho, relax, jogar, noCell) seguem a mesma estrutura nesta ordem: Condicional(is) diária(s), primeira animação de transição, iniciar animação
+da ação e resetar a barra que esta ação está relacionada, segunda animação de transição, voltar para animação de idle.
+
+*/
 function estudar() {
 	var date = new Date();
-	if((date.getDay() >= 1) || (date.getDay() <= 5))
+	//segunda a sexta
+	if((date.getDay() >= 1) && (date.getDay() <= 5))
 	{
-		if((date.getHours() >= 10 || date.getHours() <= 18) && status == 0)
+		//entre 10h e 18h
+		if((date.getHours() >= 10 && date.getHours() <= 18) && status == 0)
 		{
 			status = 1;
 			transObj.animations.play('transAnim'); 
@@ -198,46 +218,41 @@ function estudar() {
 			},7001);
 		}
 	}
-
-
-	
 }
 function banho() {
 	var date = new Date();
-	if((date.getDay() >= 1) || (date.getDay() <= 5))
+	// todo dia entre 7h e 18h
+	if((date.getHours() >= 7 && date.getHours() <= 18) && status == 0)
 	{
-		if((date.getHours() >= 10 || date.getHours() <= 18) && status == 0)
-		{
-			status = 1;
+		status = 1;
+		transObj.animations.play('transAnim');
+		
+		setTimeout(function() {
+			gotchi.animations.play('banhoAnim');
+			hBar.scale.x = 0.35;
+		}, 2100);
+		setTimeout(function() {
+			transObj.animations.stop('transAnim', true);
+		}, 2500);
+		setTimeout(function() {
 			transObj.animations.play('transAnim');
-			
-			setTimeout(function() {
-				gotchi.animations.play('banhoAnim');
-				hBar.scale.x = 0.35;
-			}, 2100);
-			setTimeout(function() {
-				transObj.animations.stop('transAnim', true);
-			}, 2500);
-			setTimeout(function() {
-				transObj.animations.play('transAnim');
-			}, 4500);
-			setTimeout(function() {
-				gotchi.animations.play('idleAnim');
-			}, 5300);
-			setTimeout(function() {
-				transObj.animations.stop('transAnim', true);
-			}, 7000);
+		}, 4500);
+		setTimeout(function() {
+			gotchi.animations.play('idleAnim');
+		}, 5300);
+		setTimeout(function() {
+			transObj.animations.stop('transAnim', true);
+		}, 7000);
 
-			setTimeout(function() {
-				status = 0;
-			},7001);			
-		}
+		setTimeout(function() {
+			status = 0;
+		},7001);			
 	}
 }
 function comer() {
 	var date = new Date();
-
-	if((date.getHours() >= 7 || date.getHours() <= 22) && status == 0)
+	//todo dia entre 7h e 22h
+	if((date.getHours() >= 7 && date.getHours() <= 22) && status == 0)
 	{
 		status = 1;
 		transObj.animations.play('transAnim');
@@ -266,10 +281,11 @@ function comer() {
 }	
 function relax() {
 	var date = new Date();
-	console.log(date.getDay());
+	//somente sábados e domingos
 	if((date.getDay() == 0 || date.getDay() == 6) && status == 0)
 	{
-		if(date >= 7 || date <= 22)
+		//entre 7h e 22h
+		if(date.getHours() >= 7 && date.getHours() <= 22)
 		{
 			status = 1;
 			transObj.animations.play('transAnim');
@@ -299,9 +315,11 @@ function relax() {
 }
 function jogar() {
 	var date = new Date();
-	if((date.getDay() >= 1 || date.getDay() <= 5) && status == 0)
+	//de segunda a sexta
+	if((date.getDay() >= 1 && date.getDay() <= 5) && status == 0)
 	{
-		if(date.getHours() >= 7 || date.getHours() <= 22)
+		//entre 7h e 22h
+		if(date.getHours() >= 7 && date.getHours() <= 22)
 		{
 			status = 1;
 			transObj.animations.play('transAnim');
@@ -328,12 +346,11 @@ function jogar() {
 			},7001);	
 		}
 	}
-}	
-
+}
 function noCell() {
 	var date = new Date();
-
-	if((date.getHours() >= 7 || date.getHours() <= 22) && status == 0)
+	//entre 7h e 22h
+	if((date.getHours() >= 7 && date.getHours() <= 22) && status == 0)
 	{
 		status = 1;
 		transObj.animations.play('transAnim');
