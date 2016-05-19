@@ -3,17 +3,70 @@ var gotchi;
 var hBar;
 var pBar;
 var transObj;
-var GameState = {
-	init: function() {
+var carregandoBtn;
+var GameState = { /* PRIMEIRO ESTADO A SER CHAMADO*/ 
+	preload: function() {
 		this.game.stage.backgroundColor = '#94c936';
-	},
-	preload: function () {
 
-		//Preload de imagens
 		this.load.image('minigameMask', 'ASSETS/GENERAL/minigame_mask.png');
+		this.load.image('GotchiLogo', "ASSETS/GENERAL/logo.png");
 		this.load.image('maskScreen', 'ASSETS/GENERAL/mask_screen.png');
-		this.load.image('middleBtn', 'ASSETS/GENERAL/btn_02.png');
-		this.load.image('sideBtn', 'ASSETS/GENERAL/btn_01.png');
+		this.load.image('facebookBtn','ASSETS/GENERAL/facebook_btn.png');
+
+		this.load.spritesheet('notfBtn', 'ASSETS/GENERAL/notificationSS.png',141,161);
+		this.load.spritesheet('muteBtn', 'ASSETS/GENERAL/muteSS.png',141,161);
+		this.load.image('middleBtn', 'ASSETS/GENERAL/btn_share.png');
+
+		game.load.atlas('loadingSS', 'ASSETS/GENERAL/carregandoSS.png', 'ASSETS/GENERAL/carregandoSS.json');
+	},
+	create: function() {
+
+
+		this.game.state.start('PreloadState');
+
+		//layer 1
+		this.maskScreen = this.game.add.sprite(189,335, 'maskScreen');
+		this.maskScreen.scale.setTo(0.35, 0.35);
+		this.maskScreen.anchor.setTo(0.5, 0.5);
+		
+		//Layer 2
+		this.logo = this.game.add.sprite(189,335, 'GotchiLogo');
+		this.logo.scale.setTo(0.35, 0.35);
+		this.logo.anchor.setTo(0.5, 0.5);
+
+		this.fbBtn = this.add.button(189,475, 'facebookBtn', fbLogin, this); // BOTÃO DO FACEBOOK
+		this.fbBtn.scale.setTo(0.35, 0.35);
+		this.fbBtn.anchor.setTo(0.5, 0.5);
+
+		//layer 3
+		this.minigameMask = this.game.add.sprite(0, 0, 'minigameMask');
+		this.minigameMask.scale.setTo(0.35, 0.35);
+
+		this.middleBtn = this.add.button(189,600, 'middleBtn', share, this); // BOTÃO DE COMPARTILHAR
+		this.middleBtn.anchor.setTo(0.5, 0.5);
+		this.middleBtn.scale.setTo(0.35, 0.35);
+
+		this.leftBtn = this.add.button(109,585, 'notfBtn', notificacao, this, 0, 0, 1, 0); // BOTÃO DE DESLIGAR NOTIFICAÇÃO
+		this.leftBtn.anchor.setTo(0.5, 0.5);
+		this.leftBtn.scale.setTo(0.35, 0.35);
+
+		this.rightBtn = this.add.button(269,585, 'muteBtn', mute, this, 0, 0, 1, 0); // BOTÃO DE MUDO
+		this.rightBtn.anchor.setTo(0.5, 0.5);
+		this.rightBtn.scale.setTo(0.35, 0.35);
+
+		game.stage.disableVisibilityChange = true; //Permite o jogo rodar sem ter o foco na tela
+
+		status = 0; // variável usada para impossibitar do usuário apertar outros botões durante animações
+
+		setInterval(function(){ 
+		//função de notificação de 4m
+		}, 240000);
+	}
+}
+var PreloadState = { /* ESTADO CHAMADO DURANTE O GAMESTATE*/
+	preload: function() {
+		console.log()
+		//Preload de imagens
 		this.load.image('healthBar', 'ASSETS/HUD/life_bar.png');
 		this.load.image('potentialBar', 'ASSETS/HUD/potential_bar.png');
 		this.load.image('barFill', 'ASSETS/HUD/bar_fill.png');
@@ -29,18 +82,24 @@ var GameState = {
 		//Preload de animações
 		game.load.atlas('char1', 'ASSETS/CHARACTER/PNGS SEQ/CHARACTER 01/character1SSjson.png', 'ASSETS/CHARACTER/PNGS SEQ/CHARACTER 01/character1SSjson.json');
 		game.load.atlas('transicao', 'ASSETS/CHARACTER/PNGS SEQ/transicaoSS.png', 'ASSETS/CHARACTER/PNGS SEQ/transicaoSS.json');
-	},
+	}
+}
+var StartState = { /* ESTADO CHAMADO SOMETE QUANDO O BOTÃO DE CONECTAR AO FACEBOOK FOR APERTADO E PRELOADSTATE ESTIVER 
+					  COMPLETAMENTE CARREGADO */
 	create: function() {
-
 
 		Phaser.Canvas.setTouchAction(game.canvas, "auto"); // disable the default "none", i.e."touch-action: none" CSS style
 		game.input.touch.preventDefault = false;
 		game.stage.backgroundColor = '#94c936';
 
-		//Criando sprites
 		this.maskScreen = this.game.add.sprite(189,335, 'maskScreen');
 		this.maskScreen.scale.setTo(0.35, 0.35);
 		this.maskScreen.anchor.setTo(0.5, 0.5);
+
+		//Criando sprites
+		transObj = game.add.sprite(189, 365, 'transicao');
+		transObj.anchor.setTo(0.5,0.5);
+		transObj.scale.setTo(1,1);
 
 		this.studyBtn = this.add.button(17,455, 'studyBtn', estudar, this, 0, 0, 1, 0);
 		this.studyBtn.anchor.setTo(0, 0.5);
@@ -66,27 +125,26 @@ var GameState = {
 		this.noCellBtn.anchor.setTo(0, 0.5);
 		this.noCellBtn.scale.setTo(0.38, 0.38);
 
-		hBar = this.game.add.sprite(22, 197, 'barFill');
-		hBar.scale.setTo(0.35, 0.34);
+		hBar = this.game.add.sprite(28, 197, 'barFill');
+		hBar.scale.setTo(0.33, 0.34);
 
 		if(parseFloat(localStorage.getItem('MyHealth')) < 0.34) //Carregando jogo passado
 		{
 			var hp = parseFloat(localStorage.getItem('MyHealth'));
-			console.log(hp);
 			hBar.scale.setTo(hp, 0.34);
 		}
-		hBar.scale.setTo(0.35, 0.34);
+		hBar.scale.setTo(0.33, 0.34);
 
-		pBar = this.game.add.sprite(353, 197, 'barFill');
+		pBar = this.game.add.sprite(347, 197, 'barFill');
 		pBar.anchor.setTo(1, 0);
+		pBar.scale.setTo(0.33, 0.34);
 
 		if(parseFloat(localStorage.getItem('MyPotential')) < 0.34) //Carregando jogo passado
 		{
 			var pp = parseFloat(localStorage.getItem('MyPotential'));
-			console.log(pp);
 			pBar.scale.setTo(pp, 0.34);
 		}
-		pBar.scale.setTo(0.35, 0.34);
+		pBar.scale.setTo(0.33, 0.34);
 
 		this.healthBar = game.add.sprite(20, 190, 'healthBar');
 		this.healthBar.scale.setTo(0.35, 0.35);
@@ -99,27 +157,20 @@ var GameState = {
 		gotchi.anchor.setTo(0.5, 0.5);
 		gotchi.scale.setTo(0.38, 0.38);
 
-		transObj = game.add.sprite(189, 365, 'transicao');
-		transObj.anchor.setTo(0.5,0.5);
-		transObj.scale.setTo(1,1);
-
 		this.minigameMask = this.game.add.sprite(0, 0, 'minigameMask');
 		this.minigameMask.scale.setTo(0.35, 0.35);
 
-		this.middleBtn = this.game.add.sprite(189,600, 'middleBtn');
+		this.middleBtn = this.add.button(189,600, 'middleBtn', share, this);
 		this.middleBtn.anchor.setTo(0.5, 0.5);
 		this.middleBtn.scale.setTo(0.35, 0.35);
 
-		this.leftBtn = this.game.add.sprite(109,585, 'sideBtn');
+		this.leftBtn = this.add.button(109,585, 'notfBtn', notificacao, this, 0, 0, 1, 0);
 		this.leftBtn.anchor.setTo(0.5, 0.5);
 		this.leftBtn.scale.setTo(0.35, 0.35);
 
-		this.rightBtn = this.game.add.sprite(269,585, 'sideBtn');
+		this.rightBtn = this.add.button(269,585, 'muteBtn', mute, this, 0, 0, 1, 0);
 		this.rightBtn.anchor.setTo(0.5, 0.5);
 		this.rightBtn.scale.setTo(0.35, 0.35);
-
-
-		game.stage.disableVisibilityChange = true; //Permite o jogo rodar sem ter o foco na tela
 
 		//Adicionar animações
 		gotchi.animations.add('idleAnim', [ "neutro__00000.png", "neutro__00001.png", "neutro__00002.png", "neutro__00003.png", "neutro__00004.png", 
@@ -178,32 +229,25 @@ var GameState = {
 
 		gotchi.animations.play('idleAnim');
 		
-		gotchi.inputEnable = true;
-
-		status = 0;
-
-		setInterval(function(){ 
-		//função de notificação de 4m
-		}, 240000);
 	},
 	update: function() {
 		//Condicionais para o decaimento das barras de Health e Potencial.
 
-		if(hBar.scale.x > 0)
+		if(hBar.scale.x > 0.001)
 		{
 			hBar.scale.x -= 0.000005;	
 		}
-		if(pBar.scale.x > 0)
+		if(pBar.scale.x > 0.001)
 		{
 			pBar.scale.x -= 0.000001;	
 		}
 	}
 }
-
 /*
 
-Todas as funções de ações(estudar, banho, relax, jogar, noCell) seguem a mesma estrutura nesta ordem: Condicional(is) diária(s), primeira animação de transição, iniciar animação
-da ação e resetar a barra que esta ação está relacionada, segunda animação de transição, voltar para animação de idle.
+Todas as funções de ações(estudar, banho, relax, jogar, noCell) seguem a mesma estrutura nesta ordem: Condicional(is) 
+diária(s), primeira animação de transição, iniciar animação da ação e resetar a barra que esta ação está relacionada, 
+segunda animação de transição, voltar para animação de idle.
 
 */
 function estudar() {
@@ -220,7 +264,7 @@ function estudar() {
 			setTimeout(function() {
 				gotchi.y = 390;
 				gotchi.animations.play('studyAnim');
-				pBar.scale.x = 0.35;
+				pBar.scale.x = 0.33;
 			}, 2100);
 			setTimeout(function() {
 				transObj.animations.stop('transAnim', true);
@@ -252,7 +296,7 @@ function banho() {
 		
 		setTimeout(function() {
 			gotchi.animations.play('banhoAnim');
-			hBar.scale.x = 0.35;
+			hBar.scale.x = 0.33;
 		}, 2100);
 		setTimeout(function() {
 			transObj.animations.stop('transAnim', true);
@@ -282,7 +326,7 @@ function comer() {
 
 		setTimeout(function() {
 			gotchi.animations.play('eatAnim');
-			hBar.scale.x = 0.35;
+			hBar.scale.x = 0.33;
 		}, 2100);
 		setTimeout(function() {
 			transObj.animations.stop('transAnim', true);
@@ -315,7 +359,7 @@ function relax() {
 
 			setTimeout(function() {
 				gotchi.animations.play('relaxAnim');
-				pBar.scale.x = 0.35;
+				pBar.scale.x = 0.33;
 			}, 2100);
 			setTimeout(function() {
 				transObj.animations.stop('transAnim', true);
@@ -349,7 +393,7 @@ function jogar() {
 
 			setTimeout(function() {
 				gotchi.animations.play('playAnim');
-				pBar.scale.x = 0.35;
+				pBar.scale.x = 0.33;
 			}, 2100);
 			setTimeout(function() {
 				transObj.animations.stop('transAnim', true);
@@ -380,7 +424,7 @@ function noCell() {
 
 		setTimeout(function() {
 			gotchi.animations.play('cellAnim');
-			pBar.scale.x = 0.35;
+			pBar.scale.x = 0.33;
 		}, 2100);
 		setTimeout(function() {
 			gotchi.animations.stop('cellAnim', false);
@@ -404,21 +448,56 @@ function noCell() {
 	}
 }
 
-window.onbeforeunload = function (e) {
-	var e = e || window.event;
+function fbLogin() { //FUNÇÃO QUE VAI SER CHAMADA NO BOTÃO DE CONECTAR COM FACEBOOK
+	console.log(this.game);
+	var statusLoad = 0;
+	this.fbBtn.destroy();
+
+	carregandoBtn = game.add.sprite(189,475, 'loadingSS');
+	carregandoBtn.anchor.setTo(0.5, 0.5);
+	carregandoBtn.scale.setTo(0.38, 0.38);
+
+	setInterval(function()
+	{
+		if(game.load.hasLoaded && statusLoad == 0)
+		{
+			statusLoad = 1;
+			game.state.start('StartState');
+		}
+	}, 500);
+	carregandoBtn.animations.add('carregando', ["LOADING_01.png","LOADING_02.png"], 2, true);
+	carregandoBtn.animations.play('carregando');
+
+	this.fbBtn.animations.play('carregando');
+
+	
+}
+function share() { // FUNCÃO QUE VAI SER CHAMADA NO BOTÃO DE SHARE
+
+}
+function notificacao() {
+
+}
+function mute() {
+
+}
+function loadStart() {
+	console.log("loading...");
+}
+function loadComplete() {
+	game.state.start('StartState');
+}
+window.onbeforeunload = function(){
+
 	localStorage.setItem('MyHealth',String(hBar.scale.x));
 	localStorage.setItem('MyPotential',String(pBar.scale.x));
 
-	//IE & Firefox
-	if (e) {
-		e.returnValue = 'Are you sure?';
-	}
+}
 
-	// For Safari
-	return "Are you sure?";
-};
 
 var game = new Phaser.Game(378, 670, Phaser.CANVAS);
 
+game.state.add('StartState', StartState);
+game.state.add('PreloadState', PreloadState);
 game.state.add('GameState', GameState);
 game.state.start('GameState');
