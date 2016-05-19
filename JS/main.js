@@ -80,7 +80,7 @@ var PreloadState = { /* ESTADO CHAMADO DURANTE O GAMESTATE*/
 		this.load.spritesheet('noCellBtn','ASSETS/HUD/noCellSS.png', 97, 194);
 
 		//Preload de animações
-		game.load.atlas('char1', 'ASSETS/CHARACTER/PNGS SEQ/CHARACTER 01/character1SSjson.png', 'ASSETS/CHARACTER/PNGS SEQ/CHARACTER 01/character1SSjson.json');
+		game.load.atlas('char1', 'ASSETS/CHARACTER/PNGS SEQ/character1SSjson.png', 'ASSETS/CHARACTER/PNGS SEQ/character1SSjson.json');
 		game.load.atlas('transicao', 'ASSETS/CHARACTER/PNGS SEQ/transicaoSS.png', 'ASSETS/CHARACTER/PNGS SEQ/transicaoSS.json');
 	}
 }
