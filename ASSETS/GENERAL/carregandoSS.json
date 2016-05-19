@@ -1,0 +1,36 @@
+{"frames": [
+
+{
+	"filename": "LOADING_01.png",
+	"frame": {"x":0,"y":0,"w":598,"h":86},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":598,"h":86},
+	"sourceSize": {"w":598,"h":86}
+},
+{
+	"filename": "LOADING_02.png",
+	"frame": {"x":598,"y":0,"w":598,"h":86},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":598,"h":86},
+	"sourceSize": {"w":598,"h":86}
+},
+{
+	"filename": "facebook_btn.png",
+	"frame": {"x":1196,"y":0,"w":752,"h":114},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":752,"h":114},
+	"sourceSize": {"w":752,"h":114}
+}],
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "carregandoSS.png",
+	"format": "RGBA8888",
+	"size": {"w":1948,"h":114},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:36ffe19b38ae90da3c47de7a2a005584:1f8cc46cc717f5891bb458c46890d759:9605cf060d893df09ecf2b6ae9c9f685$"
+}
+}
