@@ -54,14 +54,10 @@ var GameState = { /* PRIMEIRO ESTADO A SER CHAMADO*/
 
 		status = 0; // variável usada para impossibitar do usuário apertar outros botões durante animações
 
-		setInterval(function(){ 
-		//função de notificação de 4m
-		}, 240000);
 	}
 }
 var PreloadState = { /* ESTADO CHAMADO DURANTE O GAMESTATE*/
 	preload: function() {
-		console.log()
 		//Preload de imagens
 		this.load.image('healthBar', 'ASSETS/HUD/life_bar.png');
 		this.load.image('potentialBar', 'ASSETS/HUD/potential_bar.png');
@@ -86,8 +82,8 @@ var PreloadState = { /* ESTADO CHAMADO DURANTE O GAMESTATE*/
 		this.load.spritesheet('noCellBtn','ASSETS/HUD/noCellSS.png', 97, 194);
 
 		//Preload de animações
-		game.load.atlas('char1', 'ASSETS/CHARACTER/PNGS SEQ/character1SSjson.png', 'ASSETS/CHARACTER/PNGS SEQ/character1SSjson.json');
-		game.load.atlas('transicao', 'ASSETS/CHARACTER/PNGS SEQ/transicaoSS.png', 'ASSETS/CHARACTER/PNGS SEQ/transicaoSS.json');
+		game.load.atlas('char1', 'ASSETS/CHARACTER/character1SSjson.png', 'ASSETS/CHARACTER/character1SSjson.json');
+		game.load.atlas('transicao', 'ASSETS/CHARACTER/transicaoSS.png', 'ASSETS/CHARACTER/transicaoSS.json');
 	}
 }
 var StartState = { /* ESTADO CHAMADO SOMETE QUANDO O BOTÃO DE CONECTAR AO FACEBOOK FOR APERTADO E PRELOADSTATE ESTIVER 
@@ -480,7 +476,30 @@ function noCell() {
 		},7001);	
 	}
 }
+function action(type) {
 
+	var objeto = {
+		facebook:idfacebook,
+		type:type
+	}
+	url = "https://uninorte.dev.fermen.to/unigotchi/backend/action.php";
+
+	if(type=="comida"){
+
+		$.post(url, objeto).done(function(){
+
+
+		});
+	}else if(type=="feliz")
+	{
+		$.post(url, objeto).done(function(){
+
+
+		});
+
+	}
+
+}
 function fbLogin() { //FUNÇÃO QUE VAI SER CHAMADA NO BOTÃO DE CONECTAR COM FACEBOOK
 	console.log(this.game);
 	var statusLoad = 0;
@@ -502,9 +521,36 @@ function fbLogin() { //FUNÇÃO QUE VAI SER CHAMADA NO BOTÃO DE CONECTAR COM FA
 	carregandoBtn.animations.play('carregando');
 
 	this.fbBtn.animations.play('carregando');
+
+	FB.login(function() {
+
+
+
+	FB.api(
+					"/me",
+					function (response) {
+						if (response && !response.error) {
+
+						 var cadastro = 'https://uninorte.dev.fermen.to/unigotchi/backend/cadastro.php';
+
+						 idfacebook = response.id;
+						 $.post(cadastro, {nome:response.name,facebook:response.id}).done(function(){
+
+						 });
+
+
+					 }
+					}
+				);
+		});
 }
 function share() { // FUNCÃO QUE VAI SER CHAMADA NO BOTÃO DE SHARE
-
+	FB.ui({
+	  method: 'feed',
+	  link: 'https://apps.facebook.com/unigotchi/',
+		description:'Ganhar sua bolsa no vestibular da UniNorte vai ficar mais f&aacute;cil com a ajuda do Unigotchi.',
+		picture:'https://uninorte.dev.fermen.to/unigotchi/compartilhar.jpg'
+	}, function(response){});
 }
 function notificacao() {
 
@@ -575,6 +621,8 @@ function skipTutorial() {
 		tutorial6.destroy();
 	}
 	status = 0;
+	firstTime = 0;
+	localStorage.setItem('firstTime',String(firstTime));
 }
 function matriculeSe() {
 	var a = document.createElement("a");
